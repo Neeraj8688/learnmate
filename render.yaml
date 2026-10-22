@@ -1,0 +1,55 @@
+# Render Blueprint for the BACKEND only. The frontend goes on Vercel (see DEPLOY.md).
+# Verified against Render's blueprint docs (checked 2026-10); not deployed from this sandbox.
+services:
+  - type: web
+    name: learnmate-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /health
+    autoDeployTrigger: commit
+    # WARNING: the `free` instance has 512 MB RAM and an EPHEMERAL disk (accounts, notes and the vector
+    # index are wiped on every restart, redeploy and 15-minute idle spin-down). PyTorch + the embedding
+    # model very likely exceed 512 MB: measure with `docker stats` first (see DEPLOY.md). For a working
+    # persistent deployment use a paid plan such as `1c-2g` and enable the disk block below.
+    plan: free
+    # disk:                       # paid instances only; uncomment together with the SQLITE_PATH/CHROMA lines
+    #   name: learnmate-data
+    #   mountPath: /data
+    #   sizeGB: 1
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: GEMINI_API_KEY        # the shared demo key. Paste it in the Render dashboard when prompted.
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.5-flash-lite
+      - key: JWT_SECRET            # generated once by Render; stable across restarts
+        generateValue: true
+      - key: CORS_ORIGINS          # EXACT Vercel origin, e.g. https://learnmate-yourname.vercel.app (no trailing slash)
+        sync: false
+      - key: TRUST_PROXY_HEADERS
+        value: "true"
+      - key: TRUSTED_PROXY_HOPS    # UNVERIFIED for Render: confirm with /health after deploy (see DEPLOY.md)
+        value: "1"
+      - key: EPHEMERAL_STORAGE_NOTICE   # set to "false" once you attach a persistent disk
+        value: "true"
+      # --- demo limits (tune to your real Gemini quota; all optional) ---
+      - key: UPLOAD_MAX_MB
+        value: "5"
+      - key: MAX_DOCS_PER_USER
+        value: "5"
+      - key: DAILY_LLM_CALLS_PER_USER
+        value: "15"
+      - key: DAILY_LLM_CALLS_GLOBAL
+        value: "150"
+      - key: DEMO_MAX_QUESTION_CHARS
+        value: "600"
+      - key: RATE_LLM_PER_MIN
+        value: "10"
+      - key: RATE_AUTH_PER_MIN
+        value: "20"
+      # - key: SQLITE_PATH               # enable with the disk block above
+      #   value: /data/learnmate.db
+      # - key: CHROMA_PERSIST_DIRECTORY
+      #   value: /data/chroma

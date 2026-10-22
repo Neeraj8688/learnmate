@@ -1,0 +1,33 @@
+# Production: one domain, automatic HTTPS via Caddy. Backend is NOT exposed directly.
+# Usage: set DOMAIN (and your DNS A record) in .env, then:
+#   docker compose -f docker-compose.prod.yml up -d --build
+services:
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    env_file: [.env]
+    environment:
+      CHROMA_PERSIST_DIRECTORY: /data/chroma
+      SQLITE_PATH: /data/learnmate.db
+      ENVIRONMENT: production              # strict startup checks (needs JWT_SECRET and https CORS_ORIGINS)
+      TRUST_PROXY_HEADERS: "true"          # Caddy sets X-Forwarded-For / -Proto
+      CORS_ORIGINS: https://${DOMAIN}
+    volumes: [learnmate_data:/data]
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: /api
+    restart: unless-stopped
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports: ["80:80", "443:443"]
+    environment: [DOMAIN]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+    depends_on: [backend, frontend]
+volumes:
+  learnmate_data:
+  caddy_data:

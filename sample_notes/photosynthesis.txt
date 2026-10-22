@@ -1,0 +1,5 @@
+Photosynthesis is the process by which green plants convert light energy into chemical energy stored in glucose. It takes place in the chloroplasts, which contain the pigment chlorophyll.
+
+The light-dependent reactions occur in the thylakoid membranes. Water is split, oxygen is released, and ATP and NADPH are produced.
+
+The Calvin cycle occurs in the stroma. It uses ATP and NADPH to fix carbon dioxide into glucose. This stage does not need light directly.

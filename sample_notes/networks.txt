@@ -1,0 +1,3 @@
+The OSI model has seven layers: physical, data link, network, transport, session, presentation and application.
+
+TCP is a connection-oriented transport protocol that provides reliable, ordered delivery using acknowledgements and retransmission. UDP is connectionless and does not guarantee delivery, which makes it faster for streaming and DNS queries.

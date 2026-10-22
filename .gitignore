@@ -1,0 +1,25 @@
+# secrets and local config
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.jwt_secret
+.enc_key
+# local data: databases, vector store, uploads, logs
+data/
+*.db
+*.sqlite
+*.sqlite3
+chroma/
+uploads/
+*.log
+.hf/
+# tooling
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+node_modules/
+dist/
+.DS_Store
